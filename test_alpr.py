@@ -1,25 +1,29 @@
-import cv2
 from fast_alpr import ALPR
 from pathlib import Path
 
+# Initialize ALPR with default models
 alpr = ALPR(
     detector_model="yolo-v9-t-384-license-plate-end2end",
     ocr_model="global-plates-mobile-vit-v2-model",
-    )
+)
 
-assests_dir = Path("assets")
+# Define the path to the assets directory
+assets_dir = Path("assets")
+
+# Supported image extensions
 image_extensions = {".jpg", ".jpeg", ".png"}
 
-for image_path in assests_dir.glob("*"):
+# Iterate through all files in the assets directory
+for image_path in assets_dir.glob("*"):
     if image_path.suffix.lower() in image_extensions:
-        print(f"Processing {image_path}...")
         try:
-            img = cv2.imread(str(image_path))
-            if img is not None:
-                img_resized = cv2.resize(img, (384, 384))
-                alpr_results = alpr.predict(img_resized)
-                print(f"Results for {image_path}: {alpr_results}")
-            else:
-                print(f"Could not load {image_path}")
+            # Predict on the current image
+            alpr_results = alpr.predict(str(image_path))
+            # Check if there are any results
+            if alpr_results:
+                # Extract and print the plate text from the first result
+                plate_text = alpr_results[0].ocr.text
+                print(plate_text)
         except Exception as e:
-            print(f"Error processing {image_path}: {e}")
+            # Silently skip errors
+            pass

@@ -13,9 +13,7 @@ develop-eggs/
 dist/
 downloads/
 eggs/
-assets/*.png
-assets/*.jpg
-assets/*.jpeg
+assets/
 .eggs/
 lib/
 lib64/

@@ -161,7 +161,7 @@ To start contributing or to begin development, you can follow these steps:
 
 1. Clone repo
     ```shell
-    git clone https://github.com/ankandrew/fast-alpr.git
+    git clone https://github.com/bayraa-star/lpr.main.git
     ```
 2. Install all dependencies using [Poetry](https://python-poetry.org/docs/#installation):
     ```shell
@@ -170,6 +170,10 @@ To start contributing or to begin development, you can follow these steps:
 3. To ensure your changes pass linting and tests before submitting a PR:
     ```shell
     make checks
+    ```
+3. To run test_alpr.py
+    ```shell
+    poetry run python test_alpr.py
     ```
 
 ## 🙏 Acknowledgements
