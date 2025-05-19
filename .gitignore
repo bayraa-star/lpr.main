@@ -14,6 +14,8 @@ dist/
 downloads/
 eggs/
 assets/
+assets2/
+processed_ocr_detection/
 .eggs/
 lib/
 lib64/

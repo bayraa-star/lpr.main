@@ -38,6 +38,8 @@ open-image-models = "^0.2.0"
 mkdocs-material = { version = "*", optional = true }
 mkdocstrings = { version = "*", extras = ["python"], optional = true }
 mike = { version = "*", optional = true }
+pandas = "^2.2.3"
+pillow = "^11.2.1"
 
 [tool.poetry.extras]
 docs = ["mkdocs-material", "mkdocstrings", "mike"]

@@ -7,6 +7,7 @@ import statistics
 from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import Literal
+from pathlib import Path
 
 import cv2
 import numpy as np
@@ -54,6 +55,8 @@ class ALPR:
         ocr_model_path: str | os.PathLike | None = None,
         ocr_config_path: str | os.PathLike | None = None,
         ocr_force_download: bool = False,
+        save_cropped_plates: bool = False,  # New parameter to enable saving cropped plates
+        cropped_plates_dir: str | None = None,  # New parameter for save directory
     ) -> None:
         """
         Initialize the ALPR system.
@@ -78,6 +81,8 @@ class ALPR:
             ocr_config_path: Custom config path for the OCR. If None, the default configuration is
                 used.
             ocr_force_download: Whether to force download the OCR model.
+            save_cropped_plates: Boolean to enable saving of cropped plate images.
+            cropped_plates_dir: Directory path to save cropped plate images.
         """
         # Initialize the detector
         self.detector = detector or DefaultDetector(
@@ -98,6 +103,14 @@ class ALPR:
             force_download=ocr_force_download,
         )
 
+        # Initialize new parameters for saving cropped plates
+        self.save_cropped_plates = save_cropped_plates
+        self.cropped_plates_dir = cropped_plates_dir
+        if self.save_cropped_plates and self.cropped_plates_dir is None:
+            raise ValueError("cropped_plates_dir must be specified when save_cropped_plates is True")
+        if self.save_cropped_plates:
+            os.makedirs(self.cropped_plates_dir, exist_ok=True)
+
     def predict(self, frame: np.ndarray | str) -> list[ALPRResult]:
         """
         Returns all recognized license plates from a frame.
@@ -113,14 +126,24 @@ class ALPR:
             frame = cv2.imread(img_path)
             if frame is None:
                 raise ValueError(f"Failed to load image from path: {img_path}")
+            image_name = Path(img_path).stem
+        else:
+            frame = frame
+            image_name = "unknown"
 
         plate_detections = self.detector.predict(frame)
         alpr_results = []
-        for detection in plate_detections:
+        for idx, detection in enumerate(plate_detections):
             bbox = detection.bounding_box
             x1, y1 = max(bbox.x1, 0), max(bbox.y1, 0)
             x2, y2 = min(bbox.x2, frame.shape[1]), min(bbox.y2, frame.shape[0])
             cropped_plate = frame[y1:y2, x1:x2]
+
+            # Save the cropped plate if enabled
+            if self.save_cropped_plates:
+                save_path = os.path.join(self.cropped_plates_dir, f"{image_name}_plate_{idx}.jpg")
+                cv2.imwrite(save_path, cropped_plate)
+
             ocr_result = self.ocr.predict(cropped_plate)
             alpr_result = ALPRResult(detection=detection, ocr=ocr_result)
             alpr_results.append(alpr_result)
