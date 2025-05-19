@@ -16,6 +16,7 @@ eggs/
 assets/
 assets2/
 processed_ocr_detection/
+uploadToRoboflow/
 .eggs/
 lib/
 lib64/
